@@ -119,8 +119,8 @@ int main (int argc, char *argv[])
 {
 	// Initialization
 	//--------------------------------------------------------------------------------------
-	const int screenWidth = 800;
-	const int screenHeight = 450;
+	const int screenWidth = 3840;
+	const int screenHeight = 2560;
 
 	InitWindow(screenWidth, screenHeight, "graph rbk g15");
 
@@ -184,19 +184,23 @@ int main (int argc, char *argv[])
 	float offsetX = (width * graphBoxWidth) / 2.0f;
 	float offsetZ = (height * graphBoxWidth) / 2.0f;
 
-	SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+	SetTargetFPS(60);               // set to 60 fps (not sure if needed)
 	BeginDrawing();
 
 		ClearBackground(RAYWHITE); // could add option to change background color 
 
 		BeginMode3D(camera);
 
+			float minOpacity = (255.0*opacityIntensityRatio);
+			float opacityRange = 255 - minOpacity;
+			
+
 			for(int i = 0; i < height; i++) {
 				for(int j = 0; j < width; j++){
 					float range = (maxIntensity - minIntensity); // otherwise would crash if min = max
 					float interpolationPercentage = range == 0 ? 0.0f : (sensorArray[i][j] - minIntensity) / range;
 					Color thisColor = ColorLerp(lowIntensityColor, highIntensityColor, interpolationPercentage);
-					thisColor.a = (int)(((float)thisColor.a - ((opacityIntensityRatio * (float)thisColor.a)) * interpolationPercentage));
+					thisColor.a = (int) (minOpacity + (opacityRange*interpolationPercentage));
 					Vector3 thisBoxPos = {(float)(j * graphBoxWidth)-offsetX, 0.0f, (float)(i*graphBoxWidth)-offsetZ};
 					DrawCube(thisBoxPos, graphBoxWidth, (float)sensorArray[i][j], graphBoxWidth, thisColor);
 				}
